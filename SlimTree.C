@@ -152,6 +152,7 @@ void SlimTree(TString old_tree_path, TString new_tree_path, TString filename){
     matchedpartonflavour_inclusivetaggedcalojetse.clear();
     
     //Loop over untagged jets
+    if(verbose) cout << "   UNTAGGED" << endl;
     for(unsigned int j=0; j<b_ETA_BASICCALOJETS1PT20->size(); j++){
       if(verbose) cout << "   Jet: " << j << endl;
       float calo_eta = b_ETA_BASICCALOJETS1PT20->at(j);
@@ -165,7 +166,11 @@ void SlimTree(TString old_tree_path, TString new_tree_path, TString filename){
 	float pat_phi = b_PHI_BASICPATJETSPT15->at(k);
 	float my_dr = TMath::Sqrt( (calo_eta-pat_eta)*(calo_eta-pat_eta) + (calo_phi-pat_phi)*(calo_phi-pat_phi) );
 	if(verbose) cout << "      DR with " << k << ": " << my_dr << " -- " << b_CSV_BASICPATJETSPT15->at(k) << " " << b_PARTONFLAVOUR_BASICPATJETSPT15->at(k) << endl;
-	if(my_dr < min_dr) best_match_index = k;
+	if(my_dr < min_dr){
+	  best_match_index = k;
+	  min_dr = my_dr;
+	}
+	if(verbose) cout << "      my_dr " << my_dr << ", min_dr " << min_dr << ", best_match_index " << best_match_index << endl;
       }
       
       //Insert match
@@ -187,18 +192,25 @@ void SlimTree(TString old_tree_path, TString new_tree_path, TString filename){
 
 
     //Loop over tagged jets
+    if(verbose) cout << "   TAGGED" << endl;
     for(unsigned int j=0; j<b_ETA_INCLUSIVETAGGEDCALOJETSE->size(); j++){
+      if(verbose) cout << "   Jet: " << j << endl;
       float calo_eta = b_ETA_INCLUSIVETAGGEDCALOJETSE->at(j);
       float calo_phi = b_PHI_INCLUSIVETAGGEDCALOJETSE->at(j);
       
       int best_match_index = -1;
-      float min_dr = 99999;
+      float min_dr = 0.5;
       //Loop over PAT jets to find best match (currently pat jet can be used more than once)
       for(unsigned int k=0; k<b_ETA_BASICPATJETSPT15->size(); k++){
 	float pat_eta = b_ETA_BASICPATJETSPT15->at(k);
 	float pat_phi = b_PHI_BASICPATJETSPT15->at(k);
 	float my_dr = TMath::Sqrt( (calo_eta-pat_eta)*(calo_eta-pat_eta) + (calo_phi-pat_phi)*(calo_phi-pat_phi) );
-	if(my_dr < min_dr) best_match_index = k;
+	if(verbose) cout << "      DR with " << k << ": " << my_dr << " -- " << b_CSV_BASICPATJETSPT15->at(k) << " " << b_PARTONFLAVOUR_BASICPATJETSPT15->at(k) << endl;
+	if(my_dr < min_dr){
+	  best_match_index = k;
+	  min_dr = my_dr;
+	}
+	if(verbose) cout << "      my_dr " << my_dr << ", min_dr " << min_dr << ", best_match_index " << best_match_index << endl;
       }
       
       //Insert match
@@ -211,6 +223,11 @@ void SlimTree(TString old_tree_path, TString new_tree_path, TString filename){
 	matchedpartonflavour_inclusivetaggedcalojetse.push_back( -999 );
       }
       
+      if(verbose){
+	cout << "         Chose CSV: " << matchedcsv_inclusivetaggedcalojetse.at(j) << " from " << best_match_index << endl;
+        cout << "         Chose PF:  " << matchedpartonflavour_inclusivetaggedcalojetse.at(j) << " from " << best_match_index << endl;
+      }
+
     }//end loop over untagged jets
 
     //Fill new branches
