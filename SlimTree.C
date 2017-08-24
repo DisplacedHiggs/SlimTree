@@ -12,8 +12,8 @@ using namespace std;
 void SlimTree(TString old_tree_path, TString new_tree_path, TString filename){
   //gSystem->Load("$ROOTSYS/test/libEvent");
 
-  bool doPATJetMatching = true; 
-  bool verbose = true;
+  bool doPATJetMatching = true; //not fully implemented
+  bool verbose = false;
 
   //Get old file, old tree and set top branch address
   TFile *oldfile = new TFile(old_tree_path+filename);
